@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "nodemon index.js",
-    "lint": "eslint ./"
+    "lint": "eslint ./",
+    "build": ""
   },
   "author": "",
   "license": "ISC",
