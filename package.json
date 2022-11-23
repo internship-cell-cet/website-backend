@@ -6,8 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
-    "lint": "eslint ./",
-    "build": "webpack"
+    "lint": "eslint ./"
   },
   "author": "",
   "license": "ISC",
