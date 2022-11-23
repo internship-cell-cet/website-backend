@@ -35,8 +35,10 @@ app.use(
     secret: `${process.env.SECRET}`,
     resave: false,
     saveUninitialized: true,
-    cookie: { maxAge: 3600000 },
-    sameSite: 'none',
+    cookie: { 
+      maxAge: 3600000,
+      sameSite: 'none'
+     },
   }),
 );
 
