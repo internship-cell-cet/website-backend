@@ -57,7 +57,7 @@ app.use(session({
 	saveUninitialized: true,
 	cookie: {
 	    httpOnly: true,
-      // sameSite: 'None',
+      sameSite: 'None',
       // secure: true,
 	    expires: cookieExpirationDate // use expires instead of maxAge
 	}
