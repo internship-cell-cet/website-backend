@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import session from 'express-session';
+import cookieParser from 'cookie-parser';
 
 import { v2 } from 'cloudinary';
 import useRoutes from './routes/index.js';
@@ -30,18 +31,37 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(
-  session({
-    secret: `${process.env.SECRET}`,
-    resave: false,
-    saveUninitialized: true,
-    cookie: { 
-      maxAge: 3600000,
-      sameSite: 'None',
-      secure: true
-     },
-  }),
-);
+app.use(cookieParser(`${process.env.SECRET}`)); // cookie parser must use the same secret as express-session.
+
+const cookieExpirationDate = new Date();
+const cookieExpirationDays = 365;
+cookieExpirationDate.setDate(cookieExpirationDate.getDate() + cookieExpirationDays);
+
+
+// app.use(
+//   session({
+//     secret: `${process.env.SECRET}`,
+//     resave: false,
+//     saveUninitialized: true,
+//     cookie: { 
+//       maxAge: 3600000,
+//       sameSite: 'None',
+//       secure: true
+//      },
+//   }),
+// );
+
+app.use(session({
+	secret: `${process.env.SECRET}`, // must match with the secret for cookie-parser
+	resave: true,
+	saveUninitialized: true,
+	cookie: {
+	    httpOnly: true,
+      // sameSite: 'None',
+      // secure: true,
+	    expires: cookieExpirationDate // use expires instead of maxAge
+	}
+ } ));
 
 app.use(passport.initialize());
 app.use(passport.session());
