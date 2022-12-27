@@ -58,7 +58,7 @@ app.use(session({
 	cookie: {
 	    httpOnly: true,
       sameSite: 'None',
-      // secure: true,
+      secure: true,
 	    expires: cookieExpirationDate // use expires instead of maxAge
 	}
  } ));
