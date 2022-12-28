@@ -2,10 +2,10 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import session from 'express-session';
+import sessions from 'express-session';
 import cookieParser from 'cookie-parser';
-
 import { v2 } from 'cloudinary';
+
 import useRoutes from './routes/index.js';
 import passport from './config/passport.js';
 import { defaultErrorHandler } from './utils/error-handlers.js';
@@ -19,9 +19,27 @@ v2.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+const oneDay = 1000 * 60 * 60 * 24;
+
+//session middleware
+app.use(sessions({
+  secret: `${process.env.SECRET}`,
+  saveUninitialized: true,
+  proxy: true,
+  cookie: {
+    maxAge: oneDay,
+    sameSite: 'None',
+    // secure: true,
+    httpOnly: false
+  },
+  resave: false
+}));
+
 app.use(express.json({ limit: '30mb', extended: true }));
 app.use(express.urlencoded({ limit: '30mb', extended: true }));
 app.use(cors({ credentials: true, origin: `${process.env.ORIGIN}` }));
+
+app.use(cookieParser());
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', req.header('origin'));
@@ -30,38 +48,6 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Headers', 'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json');
   next();
 });
-
-app.use(cookieParser(`${process.env.SECRET}`)); // cookie parser must use the same secret as express-session.
-
-const cookieExpirationDate = new Date();
-const cookieExpirationDays = 365;
-cookieExpirationDate.setDate(cookieExpirationDate.getDate() + cookieExpirationDays);
-
-
-// app.use(
-//   session({
-//     secret: `${process.env.SECRET}`,
-//     resave: false,
-//     saveUninitialized: true,
-//     cookie: { 
-//       maxAge: 3600000,
-//       sameSite: 'None',
-//       secure: true
-//      },
-//   }),
-// );
-
-app.use(session({
-	secret: `${process.env.SECRET}`, // must match with the secret for cookie-parser
-	resave: true,
-	saveUninitialized: true,
-	cookie: {
-	    httpOnly: true,
-      sameSite: 'None',
-      secure: true,
-	    expires: cookieExpirationDate // use expires instead of maxAge
-	}
- } ));
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -74,8 +60,10 @@ app.get('/', (req, res) => {
 
 app.use(defaultErrorHandler);
 
+// PORT is set in .env file
 const PORT = process.env.PORT || 5000;
 
+// MongoDB connection
 mongoose
   .connect(process.env.CONNECTION_URL, {
     useNewUrlParser: true,
