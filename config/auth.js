@@ -1,10 +1,11 @@
 const checkAuthentication = (req, res, next) => {
   // req.isAuthenticated() will return true if user is logged in
-  if (req.isAuthenticated()) {
-    return next();
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({
+      error: 'You are not authorized to make this request',
+    });
   }
-
-  return res.status(401).send({ message: 'User Unauthorized!' });
+  return next();
 };
 
 export default checkAuthentication;
