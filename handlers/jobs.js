@@ -52,6 +52,7 @@ export const appliedJobsHandler = async (req, res, next) => {
 
     return res.json(appliedJobs);
   } catch (error) {
+    console.log("error on appliedJobsHandler", error.name, error.message);
     return next(error);
   }
 };
